@@ -2,3 +2,4 @@ Flask
 lxml
 xmlschema
 flask_cors
+PyYAML
