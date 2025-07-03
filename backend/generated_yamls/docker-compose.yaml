@@ -1,0 +1,10 @@
+services:
+  sql-db:
+    image: mysql:8.0
+    ports:
+    - 3306
+  web-app:
+    image: nginx:latest
+    ports:
+    - 8080
+version: '3.8'

@@ -1,0 +1,16 @@
+<config>
+  <environments>
+    <environment name="neuvelle">
+      <container>
+        <name>web-app</name>
+        <image>nginx:latest</image>
+        <ports>8080</ports>
+      </container>
+      <container>
+        <name>sql-db</name>
+        <image>mysql:8.0</image>
+        <ports>3306</ports>
+      </container>
+    </environment>
+  </environments>
+</config> 

@@ -6,6 +6,12 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Debug User & Docker') {
+            steps {
+                bat 'whoami'
+                bat 'docker compose --version'
+            }
+        }
         stage('Backend - Install & Test') {
             steps {
                 dir('backend') {
@@ -25,9 +31,24 @@ pipeline {
                 }
             }
         }
+        stage('Generate Docker Compose YAML') {
+            steps {
+                dir('backend') {
+                    bat 'py generate_compose.py'
+                }
+            }
+        }
         stage('Build Docker Images') {
             steps {
-                bat 'docker-compose build'
+                script {
+                    def dockerPath = 'C:\\Program Files\\Docker\\Docker\\resources\\bin'
+                    def composeFile = 'backend/generated_yamls/docker-compose.yml'
+                    withEnv(["PATH=${dockerPath};${env.PATH}"]) {
+                        bat 'docker compose --version'
+                        bat "if not exist ${composeFile} echo ERROR: File ${composeFile} not found! && exit 1"
+                        bat "docker compose -f ${composeFile} build"
+                    }
+                }
             }
         }
     }
