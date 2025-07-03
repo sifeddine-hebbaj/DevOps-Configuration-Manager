@@ -9,6 +9,9 @@ pipeline {
         stage('Backend - Install & Test') {
             steps {
                 dir('backend') {
+                    bat 'where py'
+                    bat 'py --version'
+                    bat 'py -m pip --version'
                     bat 'py -m pip install -r requirements.txt'
                     bat 'echo No backend tests configured'
                 }
