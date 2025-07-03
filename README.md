@@ -92,6 +92,116 @@ backend/generated_yamls/
 - **API REST** : Interface pour la gestion des configurations
 - **Validation XML** : Vérification des schémas de configuration
 
+## 🔧 Système XML/XSLT/XSD
+
+### Architecture de transformation
+Le projet utilise un système de transformation XML pour générer automatiquement les configurations Docker et Kubernetes :
+
+```
+XML Config → XSLT Transformation → Docker Compose / Kubernetes YAML
+```
+
+### Fichiers de configuration
+
+#### `config.xml` - Configuration principale
+```xml
+<config>
+  <environments>
+    <environment name="dev">
+      <container>
+        <name>web-app</name>
+        <image>nginx:latest</image>
+        <ports>8080</ports>
+      </container>
+    </environment>
+  </environments>
+</config>
+```
+
+#### `config.xsd` - Schéma de validation
+- **Validation structurelle** : Définit la structure autorisée des fichiers XML
+- **Types de données** : Contrôle les types de valeurs (string, integer, etc.)
+- **Contraintes** : Assure la cohérence des configurations
+
+#### `test.xml` - Fichier de test
+- **Exemple de configuration** : Démonstration de l'utilisation
+- **Validation** : Test du schéma XSD
+- **Conteneurs** : web-app (nginx) et sql-db (mysql)
+
+### Transformations XSLT
+
+#### `xml2dockercompose.xslt` - Génération Docker Compose
+```xml
+<xsl:template match="container">
+  <xsl:value-of select="name"/>:
+    image: <xsl:value-of select="image"/>
+    ports:
+      - <xsl:value-of select="ports"/>
+</xsl:template>
+```
+
+**Sortie générée :**
+```yaml
+services:
+  web-app:
+    image: nginx:latest
+    ports:
+      - 8080
+  sql-db:
+    image: mysql:8.0
+    ports:
+      - 3306
+```
+
+#### `xml2kubernetes.xslt` - Génération Kubernetes
+```xml
+<xsl:template match="container">
+  - name: <xsl:value-of select="name"/>
+    image: <xsl:value-of select="image"/>
+    ports:
+      - containerPort: <xsl:value-of select="ports"/>
+</xsl:template>
+```
+
+**Sortie générée :**
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: web-app
+        image: nginx:latest
+        ports:
+          - containerPort: 8080
+```
+
+### Workflow de transformation
+
+1. **Édition** : Modification du fichier `config.xml`
+2. **Validation** : Vérification avec `config.xsd`
+3. **Transformation** : Application des templates XSLT
+4. **Génération** : Création des fichiers YAML
+5. **Déploiement** : Utilisation par Docker/Kubernetes
+
+### Avantages du système XML/XSLT
+
+- **Séparation des préoccupations** : Configuration ≠ Génération
+- **Réutilisabilité** : Un XML → Plusieurs formats (Docker, K8s)
+- **Validation** : Schéma XSD pour la cohérence
+- **Maintenabilité** : Modifications centralisées
+- **Extensibilité** : Ajout facile de nouveaux formats
+
 ### Frontend (React)
 - **Interface utilisateur moderne** : Dashboard pour la gestion des configurations
 - **Responsive design** : Compatible desktop et mobile
