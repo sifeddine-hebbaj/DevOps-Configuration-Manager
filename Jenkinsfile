@@ -6,12 +6,14 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Debug User & Docker') {
             steps {
                 bat 'whoami'
                 bat 'docker compose --version'
             }
         }
+
         stage('Backend - Install & Test') {
             steps {
                 dir('backend') {
@@ -23,6 +25,7 @@ pipeline {
                 }
             }
         }
+
         stage('Frontend - Install & Test') {
             steps {
                 dir('frontend') {
@@ -31,6 +34,7 @@ pipeline {
                 }
             }
         }
+
         stage('Generate Docker Compose YAML') {
             steps {
                 dir('backend') {
@@ -38,6 +42,7 @@ pipeline {
                 }
             }
         }
+
         stage('Build Docker Images') {
             steps {
                 script {
@@ -51,5 +56,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Run Docker Containers') {
+            steps {
+                script {
+                    def dockerPath = 'C:\\Program Files\\Docker\\Docker\\resources\\bin'
+                    def composeFile = 'backend/generated_yamls/docker-compose.yml'
+                    withEnv(["PATH=${dockerPath};${env.PATH}"]) {
+                        bat "docker compose -f ${composeFile} up -d"
+                    }
+                }
+            }
+        }
     }
-} 
+}
