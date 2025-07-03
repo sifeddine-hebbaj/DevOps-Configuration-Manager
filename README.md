@@ -256,10 +256,6 @@ docker compose -f backend/generated_yamls/docker-compose.yml ps
 4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
 
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
 ---
 
 **Auteur** : SIF-EDDINE HEBBAJ  
